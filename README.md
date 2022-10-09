@@ -6,7 +6,9 @@ Utiliza a biblioteca Room para persistência com o banco de dados para salvar, l
 
 ## Imagens
 
-<img src=".img/inicio.png" width="200px" />
-<img src=".img/inicio2.png" width="200px" />
-<img src=".img/placares.png" width="200px" />
-<img src=".img/placares2.png" width="200px" />
+<div style="display: flex">
+  <img src=".img/inicio.png" width="200px" />
+  <img src=".img/inicio2.png" width="200px" />
+  <img src=".img/placares.png" width="200px" />
+  <img src=".img/placares2.png" width="200px" />
+</div>
