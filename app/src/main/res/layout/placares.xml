@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
             android:onClick="zerarPlacar"
-            android:text="Zerar Placar"
+            android:text="@string/button_zerar_placar"
             android:textColor="@color/black"
             app:layout_constraintBottom_toTopOf="@+id/buttonLista"
             app:layout_constraintEnd_toEndOf="parent"

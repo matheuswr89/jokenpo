@@ -13,6 +13,8 @@
     <string name="obs">Ganhador - Placar Hum - Placar PC - Tempo </string>
     <string name="place">Digite o seu nome aqui</string>
     <string name="deletar">Deseja zerar a lista de ganhadores?</string>
+    <string name="zerar_placar">Deseja zerar o placar?</string>
+    <string name="button_zerar_placar">Zerar placar</string>
     <string name="sim">Sim</string>
     <string name="nao">Não</string>
     <string name="mostrar">Mostrar Placar</string>

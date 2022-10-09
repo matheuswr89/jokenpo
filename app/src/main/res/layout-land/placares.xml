@@ -92,7 +92,7 @@
         android:layout_marginBottom="4dp"
         android:backgroundTint="@color/white"
         android:onClick="zerarPlacar"
-        android:text="Zerar placar"
+        android:text="@string/button_zerar_placar"
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/lista"
         app:layout_constraintEnd_toEndOf="parent"

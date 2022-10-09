@@ -68,6 +68,7 @@ public class Placares extends AppCompatActivity {
     }
 
     public void mostrarLista(View view) {
+        textView.setText(R.string.obs);
         buttonZerar.setVisibility(Button.VISIBLE);
         if (!editTextTextPersonName.getText().toString().isEmpty()) {
             hideKeyboard(view.getContext(), view);

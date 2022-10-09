@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void alertConfirm(View view) {
         new AlertDialog.Builder(view.getContext())
-                .setMessage(R.string.deletar)
+                .setMessage(R.string.zerar_placar)
                 .setPositiveButton(R.string.sim, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         zerarContador();
