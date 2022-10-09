@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">JoKenPo</string>
+    <string name="humano">HUMANO</string>
+    <string name="computador">COMPUTADOR</string>
+    <string name="escolha_pc">Escolha do computador</string>
+    <string name="selecione">Selecione a sua jogada:</string>
+    <string name="tesoura">tesoura</string>
+    <string name="pedra">pedra</string>
+    <string name="papel">papel</string>
+    <string name="zerar">ZERAR</string>
+    <string name="x">x</string>
+    <string name="placar">Placares</string>
+    <string name="obs">Ganhador - Placar Hum - Placar PC - Tempo </string>
+    <string name="place">Digite o seu nome aqui</string>
+    <string name="deletar">Deseja zerar a lista de ganhadores?</string>
+    <string name="sim">Sim</string>
+    <string name="nao">Não</string>
+    <string name="mostrar">Mostrar Placar</string>
+
+    <string name="config_pedra">Pedra</string>
+    <string name="config_papel">Papel</string>
+    <string name="config_tesoura">Tesoura</string>
+
+</resources>
