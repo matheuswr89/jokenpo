@@ -42,43 +42,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
-        <EditText
-            android:id="@+id/editTextTextPersonName"
-            android:layout_width="277dp"
-            android:layout_height="49dp"
-            android:layout_marginStart="67dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="67dp"
-            android:layout_marginBottom="549dp"
-            android:ems="10"
-            android:hint="@string/place"
-            android:inputType="textPersonName"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView8"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <Button
-            android:id="@+id/buttonLista"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="153dp"
-            android:layout_marginEnd="164dp"
-            android:layout_marginBottom="488dp"
-            android:backgroundTint="@color/white"
-            android:imeOptions="actionDone"
-            android:onClick="mostrarLista"
-            android:text="@string/mostrar"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.43"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName"
-            app:layout_constraintVertical_bias="0.0" />
-
         <ListView
             android:id="@+id/lista"
             android:layout_width="409dp"
@@ -90,7 +53,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView9" />
+            app:layout_constraintTop_toBottomOf="@+id/textView9"
+            app:layout_constraintVertical_bias="1.0" />
 
         <Button
             android:id="@+id/buttonZerar"
@@ -100,12 +64,10 @@
             android:onClick="zerarPlacar"
             android:text="@string/button_zerar_placar"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toTopOf="@+id/buttonLista"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView9"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

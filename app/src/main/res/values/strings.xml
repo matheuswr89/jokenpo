@@ -22,5 +22,7 @@
     <string name="config_pedra">Pedra</string>
     <string name="config_papel">Papel</string>
     <string name="config_tesoura">Tesoura</string>
-
+    <string name="placar_vazio">Nenhum placar por aqui!</string>
+    <string name="ganhou">Nenhum placar por aqui!</string>
+    <string name="perdeu">Nenhum placar por aqui!</string>
 </resources>

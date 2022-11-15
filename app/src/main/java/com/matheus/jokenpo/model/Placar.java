@@ -1,61 +1,43 @@
 package com.matheus.jokenpo.model;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
+import com.google.firebase.Timestamp;
 
-import java.util.Comparator;
+import java.util.Map;
 
-@Entity
-public class Placar implements Comparable<Placar> {
+public class Placar {
 
-    @PrimaryKey
-    public Integer uid;
     public String winner;
     public Integer hum;
     public Integer pc;
     public Double duration;
+    public Timestamp timestamp;
 
-    public Placar(String winner, Integer hum, Integer pc, Double duration) {
+    public Placar(String winner, Integer hum, Integer pc, Double duration, Timestamp timestamp) {
         this.winner = winner;
         this.hum = hum;
         this.pc = pc;
         this.duration = duration;
+        this.timestamp = timestamp;
     }
 
-    public Integer getHum() {
-        return hum;
+    public Placar(Map<String, Object> objectMap) {
+        this.duration = Double.parseDouble(objectMap.get("duration").toString());
+        this.hum = Integer.parseInt(objectMap.get("hum").toString());
+        this.pc = Integer.parseInt(objectMap.get("pc").toString());
+        this.winner = objectMap.get("winner").toString();
+        this.timestamp = ((Timestamp) objectMap.get("timestamp"));
     }
 
-    public void setHum(Integer hum) {
-        this.hum = hum;
+    public String getWinner() {
+        return winner;
     }
 
-    public Integer getPc() {
-        return pc;
-    }
-
-    public void setPc(Integer pc) {
-        this.pc = pc;
-    }
-
-    public Double getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Double duration) {
-        this.duration = duration;
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
     @Override
     public String toString() {
         return String.format("%s - %d - %d - %.2f s", winner, hum, pc, duration);
-    }
-
-    @Override
-    public int compareTo(Placar placar) {
-        return Comparator.comparing(Placar::getHum)
-                .thenComparing(Placar::getPc)
-                .thenComparing(Placar::getDuration)
-                .compare(this, placar);
     }
 }

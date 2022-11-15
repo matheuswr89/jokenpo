@@ -1,14 +1,21 @@
 package com.matheus.jokenpo;
 
-import android.content.DialogInterface;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -17,7 +24,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.matheus.jokenpo.database.AppDatabase;
+import com.google.firebase.Timestamp;
 import com.matheus.jokenpo.model.Placar;
 
 import org.json.JSONException;
@@ -33,18 +40,19 @@ public class MainActivity extends AppCompatActivity {
     private final List<String> tiposJogadas;
     private final String[][] regras;
     private final JSONObject message;
-    private AppDatabase db;
     private Boolean select;
     private TextView contadorHumano;
     private TextView contadorComputador;
     private ImageView imagem;
     private TextView resultado;
     private Spinner spinner;
-    private Button zerar;
     private Integer hum;
     private Integer pc;
     private Long initialTime;
     private Integer firstTouch;
+    MediaPlayer mp = null;
+    private String nome;
+    private EditText input;
 
     public MainActivity() throws JSONException {
         tiposJogadas = Arrays.asList("pedra", "papel", "tesoura");
@@ -52,33 +60,25 @@ public class MainActivity extends AppCompatActivity {
         message = new JSONObject("{ \"e\": \"Empatou!\", \"v\": \"Parabéns, você venceu!\",\"d\": \"Você foi derrotado!\"}");
         firstTouch = hum = pc = 0;
         initialTime = 0L;
-        db = null;
+        nome = "";
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        db = AppDatabase.getInstance(this);
-
+        createChannel();
+        if (nome.isEmpty()) exibirMensagemEdt();
         contadorHumano = findViewById(R.id.textView3);
         contadorComputador = findViewById(R.id.textView4);
         imagem = findViewById(R.id.imageView);
         resultado = findViewById(R.id.textView7);
-        zerar = findViewById(R.id.button2);
         spinner = findViewById(R.id.spinner);
         mostrarConfigs();
     }
 
     public void alertConfirm(View view) {
-        new AlertDialog.Builder(view.getContext())
-                .setMessage(R.string.zerar_placar)
-                .setPositiveButton(R.string.sim, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        zerarContador();
-                    }
-                })
+        new AlertDialog.Builder(view.getContext()).setMessage(R.string.zerar_placar).setPositiveButton(R.string.sim, (dialog, id) -> zerarContador())
                 .setNegativeButton(R.string.nao, null)
                 .show();
     }
@@ -108,17 +108,16 @@ public class MainActivity extends AppCompatActivity {
 
         List<String> listaSorteada = Arrays.asList("pedra", "papel", "tesoura");
         Collections.shuffle(listaSorteada);
-        if (select == false) setImage(listaSorteada.get(1));
+        if (!select) setImage(listaSorteada.get(1));
 
         ImageButton imageButton = (ImageButton) view;
-        resultado(select == false ? listaSorteada.get(1) : spinner.getSelectedItem().toString(),
-                imageButton.getContentDescription().toString());
+        resultado(!select ? listaSorteada.get(1) : spinner.getSelectedItem().toString(), imageButton.getContentDescription().toString());
         imageButton.setSelected(true);
         verificaSeTemBordaAtiva(imageButton);
     }
 
     public void setImage(String image) {
-        Integer idImage = getResources().getIdentifier(image, "drawable", getPackageName());
+        int idImage = getResources().getIdentifier(image, "drawable", getPackageName());
         imagem.setImageResource(idImage);
     }
 
@@ -129,13 +128,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void acrescentaContador(String resultado) {
+        releasePlayer();
+        if (hum == 5) {
+            criaAlert("Parabêns, você ganhou!", R.raw.somdesucesso, "Humano");
+        } else if (pc == 5) {
+            criaAlert("Que pena, você perdeu!", R.raw.somdefalha, "Computador");
+        }
         if (resultado.contains("derrotado")) contadorComputador.setText(String.valueOf(++pc));
         else if (resultado.contains("venceu")) contadorHumano.setText(String.valueOf(++hum));
-        if (hum == 5) {
-            redirectScreen("humano");
-        } else if (pc == 5) {
-            redirectScreen("pc");
-        }
+        mp = MediaPlayer.create(getApplicationContext(), Settings.System.DEFAULT_NOTIFICATION_URI);
+        mp.start();
     }
 
     private void verificaSeTemBordaAtiva(ImageButton imageButton) {
@@ -158,26 +160,24 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.placar) {
-            redirectScreen("menu");
+            redirectScreen("Menu");
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void redirectScreen(String tipo) {
-        String human = "";
-        if (!tipo.equals("menu")) {
-            String winner = hum == 5 ? "humano" : "Computador";
-            if (winner.equals("Computador"))
-                db.placarDao().insert(new Placar(winner, hum, pc,
-                        (System.currentTimeMillis() - initialTime) / 1000d));
-            else
-                human = new Placar(winner, hum, pc,
-                        (System.currentTimeMillis() - initialTime) / 1000d).toString();
+        if (!tipo.equals("Menu")) {
+            String winner = tipo.contains("Com") ? tipo : nome;
+            Placar placar = new Placar(winner, hum, pc,
+                    (System.currentTimeMillis() - initialTime) / 1000d,
+                    Timestamp.now());
+
+            Firebase.adicionaPlacar(placar);
             zerarContador();
         }
         Intent intent = new Intent(this, Placares.class);
-        intent.putExtra("hum", human);
+        intent.putExtra("winner", tipo);
         startActivity(intent);
     }
 
@@ -208,5 +208,52 @@ public class MainActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
+    }
+
+    private void releasePlayer() {
+        if (mp != null) {
+            mp.stop();
+            mp.release();
+            mp = null;
+        }
+    }
+
+    public void criaAlert(String titulo, int som, String tipo) {
+        releasePlayer();
+        mp = MediaPlayer.create(getApplicationContext(), som);
+        new AlertDialog.Builder(MainActivity.this).setTitle(titulo).setPositiveButton(android.R.string.ok, (dialog, which) -> redirectScreen(tipo)).setCancelable(false).show();
+        mp.start();
+    }
+
+    public void exibirMensagemEdt() {
+        AlertDialog.Builder mensagem = new AlertDialog.Builder(MainActivity.this);
+        mensagem.setTitle("Forneça o seu nome:");
+
+        input = new EditText(this);
+        mensagem.setView(input);
+        mensagem.setPositiveButton("OK", (dialog, which) -> {
+            nome = input.getText().toString();
+            if (nome.isEmpty()) exibirMensagemEdt();
+            Firebase.getUniquePlacar(nome, getApplicationContext());
+        });
+        mensagem.setCancelable(false);
+        mensagem.show();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+    }
+
+    public void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String name = "notific";
+            String description = "test";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("1", name, importance);
+            channel.setDescription(description);
+            channel.setShowBadge(true);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }
