@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class Placar {
 
+    public Integer uid;
     public String winner;
     public Integer hum;
     public Integer pc;
@@ -35,6 +36,14 @@ public class Placar {
     public Timestamp getTimestamp() {
         return timestamp;
     }
+
+    public Integer getHum() {
+        return hum;
+    }
+    public Integer getPc() {
+        return pc;
+    }
+
 
     @Override
     public String toString() {

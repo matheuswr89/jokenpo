@@ -1,13 +1,19 @@
 package com.matheus.jokenpo;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +31,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.matheus.jokenpo.model.Placar;
 
 import org.json.JSONException;
@@ -50,9 +57,10 @@ public class MainActivity extends AppCompatActivity {
     private Integer pc;
     private Long initialTime;
     private Integer firstTouch;
-    MediaPlayer mp = null;
+    private MediaPlayer mp;
     private String nome;
     private EditText input;
+    private Integer requestCode = 0;
 
     public MainActivity() throws JSONException {
         tiposJogadas = Arrays.asList("pedra", "papel", "tesoura");
@@ -61,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         firstTouch = hum = pc = 0;
         initialTime = 0L;
         nome = "";
+        mp = null;
     }
 
     @Override
@@ -68,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         createChannel();
+        getNewNotification();
         if (nome.isEmpty()) exibirMensagemEdt();
         contadorHumano = findViewById(R.id.textView3);
         contadorComputador = findViewById(R.id.textView4);
@@ -75,10 +85,22 @@ public class MainActivity extends AppCompatActivity {
         resultado = findViewById(R.id.textView7);
         spinner = findViewById(R.id.spinner);
         mostrarConfigs();
+
+        Firebase.getLastPlacar().addOnCompleteListener(task -> {
+            QuerySnapshot result = task.getResult();
+            if (result.size() > 0) {
+                Placar placar = new Placar(result.getDocuments().get(0).getData());
+                hum = placar.getHum();
+                pc = placar.getPc();
+                contadorComputador.setText(pc+"");
+                contadorHumano.setText(hum+"");
+            }
+        });
     }
 
     public void alertConfirm(View view) {
-        new AlertDialog.Builder(view.getContext()).setMessage(R.string.zerar_placar).setPositiveButton(R.string.sim, (dialog, id) -> zerarContador())
+        new AlertDialog.Builder(view.getContext()).setMessage(R.string.zerar_placar)
+                .setPositiveButton(R.string.sim, (dialog, id) -> zerarContador())
                 .setNegativeButton(R.string.nao, null)
                 .show();
     }
@@ -111,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
         if (!select) setImage(listaSorteada.get(1));
 
         ImageButton imageButton = (ImageButton) view;
-        resultado(!select ? listaSorteada.get(1) : spinner.getSelectedItem().toString(), imageButton.getContentDescription().toString());
+        resultado(!select ? listaSorteada.get(1) : spinner.getSelectedItem().toString(),
+                imageButton.getContentDescription().toString());
         imageButton.setSelected(true);
         verificaSeTemBordaAtiva(imageButton);
     }
@@ -128,14 +151,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void acrescentaContador(String resultado) {
-        releasePlayer();
+        if (resultado.contains("derrotado") && pc < 5)
+            contadorComputador.setText(String.valueOf(++pc));
+        if (resultado.contains("venceu") && hum < 5) contadorHumano.setText(String.valueOf(++hum));
+
+        Placar placar = new Placar(nome, hum, pc,
+                (System.currentTimeMillis() - initialTime) / 1000d,
+                Timestamp.now());
+
+        Firebase.adicionaPlacar(placar, "currentPlacar");
+
         if (hum == 5) {
             criaAlert("Parabêns, você ganhou!", R.raw.somdesucesso, "Humano");
-        } else if (pc == 5) {
+        }
+        if (pc == 5) {
             criaAlert("Que pena, você perdeu!", R.raw.somdefalha, "Computador");
         }
-        if (resultado.contains("derrotado")) contadorComputador.setText(String.valueOf(++pc));
-        else if (resultado.contains("venceu")) contadorHumano.setText(String.valueOf(++hum));
+        releasePlayer();
         mp = MediaPlayer.create(getApplicationContext(), Settings.System.DEFAULT_NOTIFICATION_URI);
         mp.start();
     }
@@ -173,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                     (System.currentTimeMillis() - initialTime) / 1000d,
                     Timestamp.now());
 
-            Firebase.adicionaPlacar(placar);
+            Firebase.adicionaPlacar(placar, "placares");
             zerarContador();
         }
         Intent intent = new Intent(this, Placares.class);
@@ -221,7 +253,10 @@ public class MainActivity extends AppCompatActivity {
     public void criaAlert(String titulo, int som, String tipo) {
         releasePlayer();
         mp = MediaPlayer.create(getApplicationContext(), som);
-        new AlertDialog.Builder(MainActivity.this).setTitle(titulo).setPositiveButton(android.R.string.ok, (dialog, which) -> redirectScreen(tipo)).setCancelable(false).show();
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle(titulo)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> redirectScreen(tipo))
+                .setCancelable(false).show();
         mp.start();
     }
 
@@ -254,6 +289,17 @@ public class MainActivity extends AppCompatActivity {
             channel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    public void getNewNotification(){
+        Intent intent = new Intent(this, AlarmReciever.class);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, requestCode++, intent, PendingIntent.FLAG_MUTABLE);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        if (alarmManager != null) {
+            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 60*1000, alarmIntent);
         }
     }
 }

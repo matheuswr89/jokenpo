@@ -1,4 +1,4 @@
-package com.matheus.teste;
+package com.matheus.jokenpo;
 
 import android.app.Notification;
 import android.app.NotificationManager;

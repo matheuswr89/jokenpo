@@ -34,12 +34,8 @@ public class Placares extends AppCompatActivity {
     public void mostrarLista() {
         textView.setText(R.string.obs);
         buttonZerar.setVisibility(Button.VISIBLE);
-        setListAdapter();
-        textViewLeg.setVisibility(View.VISIBLE);
-    }
-
-    private void setListAdapter() {
         listener = Firebase.getPlacares(this, textView, buttonZerar, listView);
+        textViewLeg.setVisibility(View.VISIBLE);
     }
 
     public void zerarPlacar(View view) {
