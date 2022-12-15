@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/materialize.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <section class="row center">
+      <div class="col s6">
+        <h5>Humano</h5>
+      </div>
+      <div class="col s6">
+        <h5>Computador</h5>
+      </div>
+      <div class="col s5">
+        <h3 id="human">0</h3>
+      </div>
+      <div class="col s3">
+        <h3>x</h3>
+      </div>
+      <div class="col s4">
+        <h3 id="computer">0</h3>
+      </div>
+    </section>
+    <section class="row">
+      <div class="col s12 center">
+        <button class="waves-effect waves-light btn" onclick="zerarPlacar()">
+          Zerar placar
+        </button>
+      </div>
+    </section>
+    <section class="section-center row center">
+      <div class="col s12">
+        <p>Escolha do computador:</p>
+        <select class="browser-default" onchange="valueSelect()">
+          <option value="" selected>Aletório</option>
+          <option value="pedra">Pedra</option>
+          <option value="papel">Papel</option>
+          <option value="tesoura">Tesoura</option>
+        </select>
+        <div class="row center">
+          <div class="col s12 m6">
+            <div class="card">
+              <div class="card-content">
+                <img src="images/white.png" id="imagem-pc" alt="PC" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="result">Escolha uma opção:</p>
+      </div>
+    </section>
+
+    <section class="row center">
+      <div class="col s4">
+        <button
+          class="waves-effect waves-light btn btn-image"
+          onclick="getClickButton('pedra')"
+        >
+          <img src="images/pedra.svg" alt="Pedra" />
+        </button>
+      </div>
+      <div class="col s4">
+        <button
+          class="waves-effect waves-light btn btn-image"
+          onclick="getClickButton('papel')"
+        >
+          <img src="images/papel.svg" alt="Papel" />
+        </button>
+      </div>
+      <div class="col s4">
+        <button
+          class="waves-effect waves-light btn btn-image"
+          onclick="getClickButton('tesoura')"
+        >
+          <img src="images/tesoura.svg" alt="Tesoura" />
+        </button>
+      </div>
+    </section>
+
+    <script src="js/materialize.min.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

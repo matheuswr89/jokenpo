@@ -1,0 +1,19 @@
+.btn-image {
+  height: 60px !important;
+  display: flex;
+  align-items: center;
+}
+
+.section-center {
+  margin-bottom: 10px;
+}
+.section-center p {
+  margin: 0;
+}
+.card-content {
+  height: 120px;
+}
+
+.card-content img {
+  height: 70px;
+}
